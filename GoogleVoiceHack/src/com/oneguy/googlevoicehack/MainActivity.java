@@ -1,4 +1,4 @@
-package com.example.googlevoicehack;
+package com.oneguy.googlevoicehack;
 
 import android.app.Activity;
 

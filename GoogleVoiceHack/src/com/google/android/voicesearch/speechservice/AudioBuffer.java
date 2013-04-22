@@ -12,7 +12,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import android.util.Log;
 
-import com.oneguy.AudioListener;
+import com.oneguy.googlevoicehack.AudioListener;
 
 public class AudioBuffer {
 	private static final boolean DBG = false;

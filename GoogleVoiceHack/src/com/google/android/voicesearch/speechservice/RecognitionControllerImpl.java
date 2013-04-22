@@ -28,8 +28,8 @@ import com.google.protos.speech.service.SpeechService;
 import com.google.protos.speech.service.SpeechService.Encoding;
 import com.google.protos.speech.service.SpeechService.RecognizeResponse;
 import com.google.protos.speech.service.SpeechService.ResponseMessage;
-import com.oneguy.AudioListener;
-import com.oneguy.ParmsUtil;
+import com.oneguy.googlevoicehack.AudioListener;
+import com.oneguy.googlevoicehack.ParmsUtil;
 
 public class RecognitionControllerImpl implements RecognitionController,
 		ServerConnectorCallback {

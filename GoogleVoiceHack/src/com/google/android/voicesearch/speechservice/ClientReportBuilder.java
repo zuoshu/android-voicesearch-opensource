@@ -2,7 +2,7 @@ package com.google.android.voicesearch.speechservice;
 
 import com.google.protos.speech.service.ClientReportProto;
 import com.google.protos.speech.service.SpeechService;
-import com.oneguy.InjectUtil;
+import com.oneguy.googlevoicehack.InjectUtil;
 
 public class ClientReportBuilder {
 	private int mClientPerceivedRequestStatus = -1;

@@ -24,7 +24,7 @@ import com.google.protobuf.ExtensionRegistryLite;
 import com.google.protos.speech.service.SpeechService;
 import com.google.protos.speech.service.SpeechService.ResponseMessage;
 import com.google.protos.wireless.voicesearch.VoiceSearch;
-import com.oneguy.InjectUtil;
+import com.oneguy.googlevoicehack.InjectUtil;
 
 public class TcpConnectionImpl implements Runnable {
 	private static final boolean DBG = false;

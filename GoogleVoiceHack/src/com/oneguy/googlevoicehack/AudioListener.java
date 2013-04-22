@@ -1,4 +1,4 @@
-package com.oneguy;
+package com.oneguy.googlevoicehack;
 
 import java.nio.ByteBuffer;
 
