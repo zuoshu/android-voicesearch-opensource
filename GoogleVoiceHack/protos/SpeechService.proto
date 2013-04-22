@@ -1,0 +1,427 @@
+option java_package = "com.google.protos.speech.service"; 
+option java_outer_classname = "SpeechService";
+option optimize_for = LITE_RUNTIME;
+import "protos/Alternates.proto";
+import "protos/ClientParametersProto.proto";
+import "protos/ClientReportProto.proto";
+import "protos/PartialResult.proto";
+
+//==============Message====================
+message ApplicationData{
+    extensions 1 to max;
+}
+message ApplicationRequest{
+    extend RequestMessage{
+        optional ApplicationRequest application_request = 15;
+    }
+    optional ApplicationData inputData = 1;
+}
+message ApplicationResponse{
+    extend ResponseMessage{
+        optional ApplicationResponse application_response = 15;
+    }
+    optional ApplicationData response = 1;
+    optional int32 applicationErrorCode = 2;
+}
+
+message AudioParameters{
+    required Encoding encoding = 1[default=ULAW];
+    optional int32 sampleRate = 2;
+    optional bool endpointerEnabled = 3;
+    optional bool noiseCancelerEnabled = 4;
+}
+
+message CancelRequest{
+    extend RequestMessage{
+        optional CancelRequest cancel_request= 14;
+    }
+}
+
+message CancelResponse{
+    extend ResponseMessage{
+        optional CancelResponse cancel_response = 14;
+    }
+}
+
+message CapabilitiesRequest{
+    extend RequestMessage{
+        optional CapabilitiesRequest capabilities_request = 18;
+    }
+    optional bool queryRecognitionLanguages = 1;
+    optional bool querySynthesisVoices = 2;
+}
+
+message CapabilitiesResponse{
+    extend ResponseMessage{
+        optional CapabilitiesResponse capabilities_response = 21;
+    }
+    repeated RecognitionLanguage recognitionLanguage = 1;
+    repeated SynthesisVoice synthesisVoice = 2;
+}
+
+
+message ClientReportRequest{
+    extend RequestMessage{
+        optional ClientReportRequest client_report_request = 17;
+    }
+    required ClientReport clientReport = 2;
+    optional string clientId = 3;
+}
+
+message ClientReportResponse{
+    extend ResponseMessage{
+        optional ClientReportResponse client_report_response = 17;
+    }
+}
+
+message CreateSessionRequest{
+    extend RequestMessage{
+        optional CreateSessionRequest create_session_request = 10;
+    }
+    required string clientId = 1;
+    required Protocol protocol = 2[default=TCP_STUN];
+    optional AudioParameters inputAudioParameters = 3;
+    optional string cookie = 4;
+    optional bool speculative = 5;
+    optional string locale = 6;
+    optional ProtocolFeatures protocolFeatures = 7;
+    optional fixed32 clientExperimentConfigHash = 8;
+}
+
+message CreateSessionResponse{
+    extend ResponseMessage{
+        optional CreateSessionResponse create_session_response = 10;
+    }
+    optional SocketAddress serverAddress = 1;
+    optional string stunId = 2;
+    optional ClientExperimentConfig clientExperimentConfig = 3;
+    optional fixed32 clientExperimentConfigHash = 4;
+}
+
+message DebugEvent{
+    optional int64 startTimeMs = 1;
+    optional int64 durationMs = 2;
+    optional string text = 3;
+    repeated DebugEvent subevent = 4;
+}
+
+message DestroySessionRequest{
+    extend RequestMessage{
+        optional DestroySessionRequest destroy_session_request = 11;
+    }
+}
+
+message DestorySessionResponse{
+	extend ResponseMessage{
+		optional DestorySessionResponse destory_session_response = 11;
+	}
+}
+
+message GaiaResult{
+	required GaiaResultCode code = 1[default = AUTHENTICATION_OK];
+	optional string errorMessage = 2;
+}
+
+message Grammar{
+	extensions 1 to max;
+}
+
+message LanguageTag{
+	optional string language = 1;
+	optional string baseLanguage = 2;
+	optional string region = 3;
+	optional string script = 4;
+	repeated string variant = 5;
+}
+
+message MediaData{
+	extend RequestMessage{
+		optional MediaData media_data = 16;
+	}
+	extend ResponseMessage{
+		optional MediaData media_data_response = 20;
+	}
+	required bytes data = 1;
+	optional bool endOfData = 2;
+	optional int32 sequenceNumber = 3;
+}
+
+message MediaResponse{
+	extend ResponseMessage{
+		optional MediaResponse media_response_message = 16;
+	}
+}
+
+message MessageHeader{
+    optional string sessionId = 1;
+    optional int32 requestId = 2;
+    optional string applicationId = 3;
+}
+
+message MultiRequestMessage{
+	repeated RequestMessage requestMessage = 1;
+}
+
+message MultiResponseMessage{
+	repeated ResponseMessage responseMessage = 1;
+}
+
+message ProtocolFeatures{
+    optional bool enableAck = 1[default = true];
+    optional bool enableUnsolicitDestroy = 2[default = true];
+    optional bool enableInProgressResponse = 3;
+    optional bool enableRecognitionAlternates = 4;
+    optional bool dictationMode = 5;
+    optional bool enableInProgressSynthesizeResponse = 6;
+    optional bool enableProfanityFilterCompatibility = 7;
+    optional bool enablePartialResults = 8;
+}
+
+message RecognitionHypothesis{
+	required string sentence = 1;
+	required double confidence = 2[default = 0];
+	repeated RecognitionInterpretation interpretation = 3;
+	optional string grammarId = 4;
+}
+
+message RecognitionInterpretation{
+	repeated RecognitionSlot slot = 1;
+}
+
+message RecognitionLanguage{
+	required string name = 1;
+	required LanguageTag languageTag = 2;
+	repeated LanguageTag matchingLanguage = 3;
+	optional string localizedName = 4;
+}
+
+message RecognitionResult{
+	required RecognitionStatus status = 1[default = SUCCESS];
+	repeated RecognitionHypothesis hypothesis = 2;
+	optional string utteranceId = 3;
+	optional bytes waveformData = 4;
+	optional float waveformClippedRatio = 5;
+	optional RecognitionClientAlternates alternates = 6;
+	optional uint64 startTimeUsec = 7;
+	optional uint64 endTimeUsec = 8;
+}
+
+
+message RecognitionSlot{
+	required string name = 1;
+	required string value = 2;
+	optional float confidence = 3;
+	optional string literal = 4;
+	repeated RecognitionSlot subslot = 5;
+	extensions 6 to max;
+}
+
+message RecognizeAck{
+	extend ResponseMessage{
+		optional RecognizeAck recognize_ack = 18;
+	}
+}
+
+message RecognizeRequest{
+	extend RequestMessage{
+		optional RecognizeRequest recognize_request = 12;
+	}
+	required Grammar grammar = 1;
+	optional ApplicationData inputData = 2;
+	optional string language = 3;
+	optional AudioParameters audioParameters = 4;
+	optional InputModality inputModality = 5[default = PHONE_CALL];
+	optional InputDevice inputDevice = 6[default = EMBEDDED_MICROPHONE];
+	optional string clientApplicationId = 7;
+	optional float snrDeprecated = 8;
+	optional int32 noiseLevel = 9;
+	optional int32 snr = 10;
+	optional int32 prologueLengthSamples = 11;
+	optional bool sendAudioToBackend = 12;
+	optional InputEnvironment inputEnvironment = 13[default = MOBILE_UNDOCKED];
+	optional int32 maxRecognitionResults = 14;
+	optional bool enableProfanityFilter = 15;
+	optional bool personalizationOptIn = 16;
+	optional string gaiaAuthenticationToken = 17;
+	optional AlternateParams alternateParams = 18;
+}
+
+message RecognizeResponse{
+	extend ResponseMessage{
+		optional RecognizeResponse recognize_response = 12;
+	}
+	optional RecognitionResult recognitionResult = 1;
+	optional ApplicationData response = 2;
+	optional int32 applicationErrorCode = 3;
+	optional Transcript partialTranscript = 4;
+	optional GaiaResult gaiaResult = 5;
+	optional DeprecatedPersonalizationEnabledCode deprecatedPersonalizationEnabled = 6[default = PERSONALIZATION_NOT_YET_SPECIFIED];
+	optional PartialRecognitionResult partialResult = 8;
+}
+
+message RequestMessage{
+    required MessageHeader header = 1;
+    optional bool enableDebug = 2;
+    optional string enableDebugPassword = 3;
+    
+    extensions 4 to 19;
+}
+
+message ResponseMessage{
+    required MessageHeader header = 1;
+    required Status status = 2[default=OK];
+    optional string errorDetail = 3;
+    optional DebugEvent debugEvent = 4;
+     
+    extensions 5 to 22;
+}
+
+message SettingsRequest{
+	extend RequestMessage{
+		optional SettingsRequest settings_request = 19;
+	}
+	optional string deprecatedGaiaAuthenticationToken = 1;
+	optional DeprecatedPersonalizationSettingCode deprecatedPersonalizationOptIn = 2[default = INQUIRE_PERSONALIZATION];
+}
+
+message SettingsResponse{
+	extend ResponseMessage{
+		optional SettingsResponse settings_response = 22;
+	}
+	optional GaiaResult deprecatedGaiaResult = 1;
+	optional DeprecatedPersonalizationEnabledCode deprecatedPersonalizationEnabled = 2[default = PERSONALIZATION_NOT_YET_SPECIFIED];
+}
+
+message SocketAddress{
+	required string Host = 1;
+	required int32 port = 2;
+}
+
+message SynthesisParams{
+	optional double speed = 1;
+	optional double pitch = 2;
+	optional double volume = 3;
+}
+
+message SynthesisVoice{
+	required string language = 1;
+	optional string gender = 2;
+	optional string name = 3;
+	optional int32 sampleRate = 4;
+	optional string engine = 5;
+}
+
+message SynthesizeAck{
+	extend ResponseMessage{
+		optional SynthesizeAck synthesize_ack = 19;
+	}
+}
+
+message SynthesizeRequest{
+	extend RequestMessage{
+		optional SynthesizeRequest synthesize_request = 13;
+	}
+	required Encoding encoding = 1[default = ULAW];
+	optional string ssml = 2;
+	required SynthesisVoice voice = 3;
+	optional int32 audioChunkSize = 4[default = 1024];
+	optional ApplicationData request = 5;
+	optional SynthesisParams params = 6;
+	
+}
+
+message SynthesizeResponse{
+	extend ResponseMessage{
+		optional SynthesizeResponse synthesize_response = 13;
+	}
+	optional SynthesisStatus status = 1[default = SYNTHESIS_SUCCESS];
+	optional ApplicationData response = 2;
+	optional int32 applicationErrorCode = 3;
+	optional Encoding audioEncoding = 4[default = ULAW];
+	optional int32 audioRate = 5;
+}
+
+message Transcript{
+	required string transcript = 1;
+}
+
+//==============Enum====================
+enum Status{
+    OK = 0;
+    INVALID_REQUEST = 4;
+    SERVER_FAILURE = 5;
+    CANCELED = 11;
+    IN_PROGRESS = 12;
+    TOO_BUSY = 13;
+    PREPROCESSOR_ERROR = 14;
+}
+     
+enum DeprecatedPersonalizationEnabledCode{
+	PERSONALIZATION_NOT_YET_SPECIFIED = 0;
+	PERSONALIZATION_OPTED_OUT = 1;
+	PERSONALIZATION_OPTED_IN = 2;
+}
+enum DeprecatedPersonalizationSettingCode{
+	INQUIRE_PERSONALIZATION = 0;
+	SET_PERSONALIZATION_OPT_OUT = 1;
+	SET_PERSONALIZATION_OPT_IN = 2;
+}
+enum Encoding{
+    ULAW = 1;
+    LINEAR_16 = 2;
+    AMR_NB = 4;
+    SPEEX_NB = 6;
+    FLAC = 7;
+    MP3 = 8;
+    SPEEX_WB = 9;
+}
+
+enum Protocol{
+    TCP_STUN = 1;
+    HTTP = 2;
+    STUBBY = 3;
+    TCP_DIRECT = 4;
+}
+
+enum RecognitionStatus{
+	SUCCESS = 0;
+	NO_INPUT_TIMEOUT = 1;
+	NO_MATCH = 2;
+	RECOGNITION_TIMEOUT = 3;
+	GRAMMAR_FAILURE = 6;
+	NO_DATA = 7;
+	TOO_MUCH_SPEECH_TIMEOUT = 20;
+	TOO_MUCH_COMPUTE = 21;
+	SPEECH_TOO_EARLY = 22;
+	RECOGNITION_ABORTED = 23;
+}
+
+enum SynthesisStatus{
+	SYNTHESIS_SUCCESS = 0;
+	INVALID_SYNTHESIS_REQUEST = 1;
+	INVALID_SSML = 2;
+	SYNTHESIS_FAILED =3;
+	SYNTHESIZER_TOO_BUSY = 4;
+}
+enum GaiaResultCode{
+	AUTHENTICATION_OK = 0;
+	GAIA_TOKEN_EXPIRED = 1;
+	GAIA_ERROR = 2;
+}
+enum InputModality{
+	PHONE_CALL = 1;
+	PUSH_TO_TALK = 2;
+	PUSH_AND_HOLD_TO_TALK = 3;
+	JUST_TALK = 4;
+}
+enum InputDevice{
+	EMBEDDED_MICROPHONE = 1;
+	WIRED_MICROPHONE = 2;
+	BLUETOOTH_MICROPHONE = 3;
+	EMBEDDED_MICROPHONE_HANDFREE = 4;
+}
+enum InputEnvironment{
+	MOBILE_UNDOCKED = 1;
+	MOBILE_CAR_DOCK = 2;
+	DESKTOP = 3;
+}

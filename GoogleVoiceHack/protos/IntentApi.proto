@@ -1,0 +1,15 @@
+option java_package = "com.google.protos.speech.apps.intentapi"; 
+option java_outer_classname = "IntentApi";
+option optimize_for = LITE_RUNTIME;
+import "protos/SpeechService.proto";
+import "protos/RecognitionContextProto.proto";
+
+message IntentApiGrammar{
+    extend Grammar{
+        optional IntentApiGrammar intent_api_grammar = 13;
+    }
+    optional string languageModel = 1;
+    optional int32 maxNbest = 2;
+    optional RecognitionContext recognitionContext = 3;
+    optional string grxmlGrammar = 4;
+}

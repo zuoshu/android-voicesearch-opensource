@@ -1,0 +1,25 @@
+option java_package = "com.google.protos.speech.common"; 
+option java_outer_classname = "RecognitionContextProto";
+option optimize_for = LITE_RUNTIME;
+
+message RecognitionContext{
+    optional string applicationName= 1;
+    optional string fieldName = 2;
+    optional string fieldId = 3;
+    optional bool singleLine = 4;
+    optional string label = 5;
+    optional string hint = 6;
+    optional int32 inputType = 7;
+    optional int32 imeOptions = 8;
+    optional string languageModel = 9;
+    optional string language = 10;
+    optional string clientId = 11;
+    optional bool hasGrxmlGrammar = 12;
+    optional string selectedKeyboardLanguage = 13;
+    repeated string enabledKeyboardLanguage = 14;
+    optional string voiceSearchLanguage = 15;
+    optional string referer = 16;
+    optional string userAgent = 17;
+    optional string hardware = 18;
+    optional string clientApplicationId = 19;
+}

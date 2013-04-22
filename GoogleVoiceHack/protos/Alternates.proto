@@ -1,0 +1,24 @@
+option java_package = "com.google.protos.speech.common"; 
+option java_outer_classname = "Alternates";
+option optimize_for = LITE_RUNTIME;
+
+message Alternate{
+	required string text = 1;
+	optional float confidence = 2;
+}
+message AlternateParams{
+	optional int32 maxSpanLength = 1;
+	optional int32 maxTotalSpanLength = 2;
+}
+
+message AlternateSpan{
+	required int32 start = 1;
+	required int32 length = 2;
+	repeated Alternate alternates = 3;
+	optional float confidence = 4;
+}
+
+message RecognitionClientAlternates{
+	repeated AlternateSpan span = 1;
+	required int32 maxSpanLength = 2;
+}

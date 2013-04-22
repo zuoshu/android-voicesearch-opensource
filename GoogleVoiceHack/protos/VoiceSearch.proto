@@ -1,0 +1,273 @@
+option java_package = "com.google.protos.wireless.voicesearch"; 
+option java_outer_classname = "VoiceSearch";
+option optimize_for = LITE_RUNTIME;
+import "protos/SpeechService.proto";
+import "protos/Alternates.proto";
+
+message ActionHypothesis{
+    required string sentence = 1;
+    repeated ActionInterpretation interpretation = 2;
+}
+message ActionInterpretation{
+    enum Action{
+        CALL = 1;
+        NAVIGATE_TO = 2;
+        DIRECTIONS_TO = 3;
+        MAP_OF = 4;
+        STATUS_UPDATE = 5;
+        DROID_DOES = 7;
+        WEB_SEARCH = 8;
+        INTENT = 9;
+        CALL_NUMBER = 10;
+        DISPLAY_CONTACT = 11;
+        CALL_BUSINESS = 12;
+        ONEBOX = 16;
+        GO_TO = 17;
+        LISTEN_TO = 18;
+        NOTE_TO_SELF = 6;
+        SEND_EMAIL = 13;
+        SEND_SMS = 14;
+        SET_ALARM = 15;
+    }
+    optional Action action = 1[default = CALL];
+    optional string query = 2;
+    optional string actionLiteral = 3;
+    optional string sentence = 4;
+    optional MapsResponseItem mapsInfo = 100;
+    optional ContactsResponseItem contactsInfo = 101;
+    optional string phoneNumber = 102;
+    optional Intent intent = 103;
+    optional WebSearchResponseItem websearchInfo = 104;
+    optional BusinessResponseItem businessInfo = 105;
+    optional MultislotActionResponseItem multislotActionInfo = 106;
+    optional GoToResponseItem goToInfo = 107;
+}
+
+message ActionRequest{
+    extend ApplicationData{
+        optional ActionRequest actionRequest = 24;
+    }
+    repeated ActionInterpretation.Action supportedAction = 1;
+    optional MapsRequestData mapsRequestData = 100;
+    optional WebSearchRequestData websearchRequestData = 101;
+    optional MultislotActionContext multislotActionContext = 102; 
+}
+
+message ActionResponse{
+    extend ApplicationData{
+        optional ActionResponse action_response = 25;
+    }
+    repeated ActionHypothesis hypothesis = 1;
+    repeated ActionInterpretation interpretation = 2;
+    optional bool displayDisambiguation = 3;
+}
+
+message ActionSlot{
+    required string key = 1;
+    required ActionSlotValue value = 2;
+    
+}
+message ActionSlotValue{
+    optional string stringValue = 1;
+    repeated ContactsResponseItem contactsListValue = 2;
+    optional int32 intValue = 3;
+    optional RecognitionClientAlternates alternates = 4;
+    repeated ContactsWithAlternatesResponseItem contactsWithAltsValue = 5;
+}
+
+message BusinessResponseItem{
+    required string name = 1;
+    required string phoneNumber = 2;
+    optional string address = 3;
+}
+
+message ConfigurableGrammar{
+    extend Grammar{
+        optional ConfigurableGrammar configurable_grammar = 18;
+    }
+    repeated string gaiaAuthenticationToken = 1;
+    optional string kansasId = 2;
+    optional bool useSpeechpersonalizationGaiaAuthenticationTokens = 3;
+}
+
+message Contact{
+    enum PhoneNumberType{
+        MOBILE = 1;
+        HOME = 2;
+        WORK = 3;
+        OTHER = 4;
+        HOME_FAX = 5;
+        WORK_FAX = 6;
+        PAGER = 7;
+    }
+    enum Action{
+        CALL = 1;
+        NOTE_TO_SELF = 2;
+        SEND_EMAIL = 3;
+        SEND_SMS = 4;
+    }
+    required string name = 1;
+    optional PhoneNumberType phoneNumberType = 2[default=MOBILE];
+    optional Action action = 3[default=CALL];
+    required string sentence = 4;
+}
+
+message ContactData{
+    repeated Contact contact = 1;
+    required int32 priority = 2;
+    required bool highConfidence = 3;
+}
+message ContactsResponseItem{
+    required string name = 1;
+    optional Contact.PhoneNumberType phoneNumberType = 22[default=MOBILE];
+}
+
+message ContactsWithAlternatesResponseItem{
+    repeated ContactsResponseItem contact = 1;
+}
+
+message FocusGrammar{
+    extend Grammar{
+        optional FocusGrammar focus_grammar = 14;
+    }
+    optional int64 deprecatedGaiaId = 1;
+    required string gaiaAuthenticationToken = 2;
+}
+message GaiaStatus{
+    optional ApplicationErrorStatus errorStatus = 1[default = UNKNOWN_ERROR];
+    optional string errorMessage = 2;
+}
+
+message GaiaStatusList{
+    extend ApplicationData{
+        optional GaiaStatusList gaia_status_list = 26;
+    }
+    repeated GaiaStatus gaiaStatus = 1;
+}
+
+message GenericAttribute{
+    required string name = 1;
+    required string value = 2;
+}
+
+message GoToResponseItem{
+    optional string url = 1;
+    optional string displayUrl = 2;
+    optional string name = 3;
+}
+
+message Intent{
+    optional string componentName = 1;
+    required string action = 2;
+    optional string data = 3;
+    optional string dataType = 4;
+    repeated string category = 5;
+    repeated IntentExtra extra = 6;
+    repeated int32 flag = 7;
+    optional string hdpiCountdownIconUrl = 8;
+    optional string mdpiCountdownIconUrl = 9;
+    optional string hdpiListItemIconUrl = 10;
+    optional string mdpiListItemIconUrl = 11;
+}
+message IntentExtra{
+    required string name = 1;
+    required string value = 2;
+}
+
+message KansasContact{
+    required string name = 1;
+    repeated Contact.PhoneNumberType phoneNumberType = 2;
+}
+
+message KansasContactData{
+    extend ApplicationData{
+        optional KansasContactData kansa_contact_data = 12;
+    }
+    optional string kansasId = 1;
+    repeated KansasContact contact = 2;
+    optional string language = 3;
+}
+
+message KansasGrammar{
+    extend Grammar{
+        optional KansasGrammar kansas_grammar = 15;
+    }
+    required string kansasId = 1;
+}
+
+message MapsRequestData{
+    required string mapsServerUrl = 1;
+    required bytes gmmBinaryHeader = 2;
+    required bytes gmmSearchRequestProto = 3;
+    required string userAgent = 4;
+    optional MultiModalData.ContentEncoding gmmServerResponseEncoding = 5[default=NONE];
+}
+
+message MapsResponseItem{
+    required string query = 1;
+    optional bytes gmmServerResponse = 2;
+    optional MultiModalData.ContentEncoding gmmServerResponseEncoding = 3[default=NONE];
+}
+
+message MultiModalData{
+    enum ContentEncoding{
+        NONE = 1;
+        GZIP = 2;
+    }
+    extend ApplicationData{
+        optional MultiModalData multiModalData = 10;
+    }
+    optional bytes data = 1;
+    optional MultiModalData.ContentEncoding responseContentEncoding = 2[default = NONE];
+    optional int32 priority = 3;
+    optional bytes googleSearchRequestProtoData = 4;
+    optional string serverHttpUrl = 5;
+    optional string serverProtoUrl = 6;
+    optional bool highConfidence = 7;
+    repeated ActionInterpretation.Action skipWebsearchAction = 8;
+    optional bool skipWebsearchAlways = 9;
+}
+
+message MultislotActionContext{
+    required ActionInterpretation.Action actionType = 1[default = CALL];
+    optional string selectedSlot = 2;
+}
+
+message MultislotActionResponseItem{
+    repeated ActionSlot actionSlot = 1;
+}
+message WebSearchGrammar{
+    extend Grammar{
+        optional WebSearchGrammar web_search_grammar = 12;
+    }
+}
+message WebSearchRequestData{
+    optional MultiModalData.ContentEncoding responseContentEncoding = 1;
+    required bytes googleSearchRequestProto = 2;
+    optional string serverHttpUrl = 3;
+    optional string serverProtoUrl = 4;
+    repeated ActionInterpretation.Action skipWebsearchAction = 5;
+    optional bool skipWebsearchAlways = 6;
+}
+
+message WebSearchResponseItem{
+    required string query = 1;
+    optional string url = 2;
+    optional string pageHtml = 3;
+    optional MultiModalData.ContentEncoding pageHtmlEncoding = 4[default=NONE];
+    repeated GenericAttribute httpHeader = 5;
+}
+
+enum ApplicationErrorStatus{
+    UNKNOWN_ERROR = 0;
+    KANSAS_INVALID_ID = 1;
+    KANSAS_SERVER_EXCEPTION = 2;
+    GAIA_AUTHENTICATION_ERROR = 3;
+    FOCUS_SERVER_EXCEPTION = 4;
+    KANSAS_NO_DATA = 5;
+    GRAMMAR_COMPILE_EXCEPTION = 6;
+    UNKNOWN_APPLICATION_DATA = 7;
+    GAIA_AUTHENTICATION_TOKEN_EXPIRED = 8;
+    UNSUPPORTED_LANGUAGE = 9;
+    INVALID_REQUEST_VOICESEARCH = 10;
+}

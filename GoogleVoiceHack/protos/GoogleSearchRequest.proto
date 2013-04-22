@@ -1,0 +1,35 @@
+option java_package = "com.google.protos.speech.voicesearch"; 
+option java_outer_classname = "GoogleSearchRequest";
+option optimize_for = LITE_RUNTIME;
+import "protos/RecognitionResultSet.proto";
+
+message GoogleSearchRequestProto{
+    enum SafeSearchFilter{
+        NONE_FILTER = 0;
+        MODERATE_FILTER = 1;
+        STRICT_FILTER = 2;
+    }
+    required string applicationId = 1;
+    required RecognitionResultSetProto recognitionResultSet = 2;
+    repeated RequestAttributeProto attributes = 3;
+    optional string masfCookie = 4;
+    optional string utteranceId = 5;
+    optional string latLong = 6;
+    optional GoogleSearchRequestProto.SafeSearchFilter safeSearchFilter = 7;
+    optional string clientId = 8;
+    repeated RequestAttributeProto httpHeader = 9;
+    
+}
+
+message GoogleSearchResponseProto{
+    repeated group Result =1{
+        required string query = 2;
+        optional string pageHtml = 3;
+        optional string url = 4;
+    }
+    repeated RequestAttributeProto httpHeader = 5; 
+}
+message RequestAttributeProto{
+    required string name = 1;
+    required string value = 2;
+}

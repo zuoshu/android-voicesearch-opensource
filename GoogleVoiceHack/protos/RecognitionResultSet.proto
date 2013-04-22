@@ -1,0 +1,16 @@
+option java_package = "com.google.protos.multimodal"; 
+option java_outer_classname = "RecognitionResultSet";
+option optimize_for = LITE_RUNTIME;
+
+message RecognitionResultProto{
+    required string result = 1;
+    required int32 confidence = 2;
+    optional int32 nlconfidence = 3;
+    optional string grammarContext = 4;
+}
+
+message RecognitionResultSetProto{
+    repeated RecognitionResultProto results = 1;
+    optional int32 confidencehighthreshold = 2;
+    optional int32 confidencelowthreshold = 3;
+}

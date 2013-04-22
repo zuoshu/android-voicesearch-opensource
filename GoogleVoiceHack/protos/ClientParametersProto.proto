@@ -1,0 +1,15 @@
+option java_package = "com.google.protos.speech.service"; 
+option java_outer_classname = "ClientParametersProto";
+option optimize_for = LITE_RUNTIME;
+
+message ClientParameters{
+	optional bool useWidebandSpeex = 1;
+	optional bool enableHifiForWifi = 2;
+	optional double bandwidthEstimatorMeanRttThresholdSecs = 3[default = 0.15];
+	optional double bandwidthEstimatorStdevRttThresholdSecs = 4[default = 0.1];
+	optional double bandwidthEstimatorPacketLossThreshold = 5[default = 0.15];
+	optional bool showHintOnHelp = 6;
+}
+message ClientExperimentConfig{
+	optional ClientParameters clientParameters = 1;
+}

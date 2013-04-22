@@ -1,0 +1,12 @@
+option java_package = "com.google.protos.speech.service"; 
+option java_outer_classname = "PartialResult";
+option optimize_for = LITE_RUNTIME;
+
+message PartialRecognitionResult{
+    repeated RecognitionResultPart part = 1;
+}
+
+message RecognitionResultPart{
+    optional string transcript = 1;
+    optional double stabilityConfidence = 2;
+}

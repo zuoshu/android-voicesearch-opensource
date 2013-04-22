@@ -1,0 +1,88 @@
+option java_package = "com.google.protos.speech.service"; 
+option java_outer_classname = "ClientReportProto";
+option optimize_for = LITE_RUNTIME;
+
+message AudioInputInfo{
+    extend ClientReport{
+        optional AudioInputInfo audio_input_info = 10;
+    }
+    enum EndpointTriggerType{
+        TIMEOUT = 1;
+        PUSH_AND_HOLD = 2;
+        AUDIO = 3;
+        GESTURE = 4;
+        TAP_TO_END = 5;
+        SERVER_AUDIO = 6;
+    }
+    optional EndpointTriggerType endpointTriggerType = 1[default = TIMEOUT];
+}
+message ClientReport{
+    enum ClientPerceivedRequestStatus{
+        NO_CLIENT_ERROR = 0;
+        BAD_RESPONSE = 1;
+        REQUEST_CANCELED = 2;
+        INVALID_SESSION_DEPRECATED = 3;
+        REQUEST_TIMEOUT = 4;
+        NETWORK_CONNECTIVITY_ERROR = 5;
+        TCP_CONNECTION_FAILURE = 6;
+        CREATE_CONNECTION_FAILURE = 7;
+        CLIENT_SIDE_ERROR = 20;
+    }
+	optional ClientPerceivedRequestStatus clientPerceivedRequestStatus = 1[default=NO_CLIENT_ERROR];
+	optional int32 clientSideError = 2;
+	optional int32 requestAckLatencyMs = 3;
+	optional int32 userPerceivedLatencyMs = 4;
+	optional int32 selectedNbestIndex = 5;
+	optional int32 totalLatencyMs = 6;
+	optional int32 inProgressResultLatencyMs = 7;
+	optional RecognitionQualityInfo recognitionQualityInfo = 12;
+	extensions 8 to 11;
+}
+message MobileInfo{
+    extend ClientReport{
+        optional MobileInfo mobile_info = 11;
+    }
+    enum CellIdStatus{
+        SAME = 1;
+        CHANGED= 2;
+    }
+    enum NetworkType{
+        WIFI = 1;
+        EDGE = 2;
+        THREE_G = 3;
+        GPRS = 4;
+        CDMA = 5;
+        CELLULAR = 6;
+        WIRED = 7;
+    }
+    optional CellIdStatus cellIdStatus = 1[default = SAME];
+    optional int32 signalStrength = 2;
+    optional float bandwidth = 3;
+    optional NetworkType networkType = 4[default = WIFI];
+}
+message RecognitionQualityInfo{
+	optional int32 correctIndex = 1;
+	optional bool noneCorrect = 2;
+	optional string correctResult = 3;
+	optional CorrectResultStatus correctResultStatus = 4[default = OK];
+	repeated SelectedAlternateSpan selectedAlternateSpans = 5;
+	
+	enum CorrectResultStatus{
+        OK = 1;
+        UNAVAILABLE = 2;
+        TOO_MANY_USER_CORRECTIONS = 3;
+    }
+}
+
+message SelectedAlternateSpan{
+    optional uint32 unit = 1;
+    optional uint32 start = 2;
+    optional uint32 length = 3;
+    optional string recognizedText = 4;
+    optional string selectedText = 5;
+    optional uint32 segmentUtteranceId = 6;
+}
+enum AlternateUnit{
+    WORD = 1;
+    UTF8_BYTES = 2;
+}
