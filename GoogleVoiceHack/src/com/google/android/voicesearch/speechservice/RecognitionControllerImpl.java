@@ -20,8 +20,6 @@ import android.os.Message;
 import android.speech.RecognitionListener;
 import android.util.Log;
 
-import com.cyberobject.AudioListener;
-import com.cyberobject.recognize.ParmsUtil;
 import com.google.android.voicesearch.endpointer.EndpointerInputStream;
 import com.google.android.voicesearch.endpointer.MicrophoneInputStream;
 import com.google.protos.speech.service.ClientReportProto.ClientReport.ClientPerceivedRequestStatus;
@@ -30,6 +28,8 @@ import com.google.protos.speech.service.SpeechService;
 import com.google.protos.speech.service.SpeechService.Encoding;
 import com.google.protos.speech.service.SpeechService.RecognizeResponse;
 import com.google.protos.speech.service.SpeechService.ResponseMessage;
+import com.oneguy.AudioListener;
+import com.oneguy.ParmsUtil;
 
 public class RecognitionControllerImpl implements RecognitionController,
 		ServerConnectorCallback {

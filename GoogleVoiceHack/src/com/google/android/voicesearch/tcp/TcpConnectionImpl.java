@@ -16,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 import android.os.SystemClock;
 import android.util.Log;
 
-import com.cyberobject.inject.InjectUtil;
 import com.example.googlevoicehack.BuildConfig;
 import com.google.android.voicesearch.speechservice.ConnectionCallback;
 import com.google.android.voicesearch.speechservice.ConnectionException;
@@ -25,6 +24,7 @@ import com.google.protobuf.ExtensionRegistryLite;
 import com.google.protos.speech.service.SpeechService;
 import com.google.protos.speech.service.SpeechService.ResponseMessage;
 import com.google.protos.wireless.voicesearch.VoiceSearch;
+import com.oneguy.InjectUtil;
 
 public class TcpConnectionImpl implements Runnable {
 	private static final boolean DBG = false;

@@ -1,4 +1,4 @@
-package com.cyberobject.inject;
+package com.oneguy;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;

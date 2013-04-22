@@ -1,4 +1,4 @@
-package com.cyberobject.recognize;
+package com.oneguy;
 
 import java.util.ArrayList;
 import java.util.List;

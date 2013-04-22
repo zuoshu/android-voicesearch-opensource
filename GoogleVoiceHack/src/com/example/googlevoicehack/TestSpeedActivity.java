@@ -15,7 +15,6 @@ import android.widget.Button;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.cyberobject.inject.InjectUtil;
 import com.google.android.voicesearch.speechservice.ClientReportBuilder;
 import com.google.android.voicesearch.speechservice.MicrophoneManager;
 import com.google.android.voicesearch.speechservice.MicrophoneManagerImpl;
@@ -27,6 +26,7 @@ import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.protos.speech.service.PartialResult.PartialRecognitionResult;
 import com.google.protos.speech.service.SpeechService.RecognitionHypothesis;
 import com.google.protos.speech.service.SpeechService.RecognitionResult;
+import com.oneguy.InjectUtil;
 
 public class TestSpeedActivity extends Activity implements OnTouchListener,
 		RecognitionListener, OnClickListener {
