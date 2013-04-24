@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <TextView 
+    <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/hello_world" />
@@ -27,42 +27,43 @@
         android:layout_height="wrap_content"
         android:text="stop record" >
     </Button>
-    
+
     <Button
         android:id="@+id/play"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="play" >
     </Button>
-    
+
+    <!--
     <Button
         android:id="@+id/stopPlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="stop play" >
-    </Button>
-    
+    </Button>    -->
+
     <Button
-        android:id="@+id/testServerConnectorImpl"
+        android:id="@+id/oneshot"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="test ServerConnectorImpl" >
+        android:text="google voice oneshot" >
     </Button>
-    
+
     <Button
-        android:id="@+id/testAudio"
+        android:id="@+id/convert"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="testAudio" >
+        android:text="convert audio" >
     </Button>
-    
+
     <Button
         android:id="@+id/startAudioBuffer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="startAudioBuffer" >
     </Button>
-    
+
     <Button
         android:id="@+id/stopAudioBuffer"
         android:layout_width="wrap_content"

@@ -1,7 +1,13 @@
 package com.oneguy.googlevoicehack;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+
 import android.app.Activity;
 import android.content.Intent;
+import android.media.AudioFormat;
 import android.os.Bundle;
 import android.os.Handler;
 import android.speech.RecognitionListener;
@@ -36,6 +42,8 @@ public class TestSpeedActivity extends Activity implements OnTouchListener,
 	private static final String TAG = "TestSpeedActivity";
 	private ScrollView mInfoScroll;
 	private Handler mHandler;
+	private MyAudioTrack mAudioTrack;
+	public static final String FILE_NAME = "/logsound.pcm";
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +52,7 @@ public class TestSpeedActivity extends Activity implements OnTouchListener,
 		InjectUtil.logLong(l1);
 		ServerConnector connector = new ServerConnectorImpl();
 		MicrophoneManager manager = new MicrophoneManagerImpl(this);
+
 		engine = new RecognitionControllerImpl(this, connector, manager);
 		setContentView(R.layout.test_speed);
 		Button speak = (Button) findViewById(R.id.speak);
@@ -51,6 +60,12 @@ public class TestSpeedActivity extends Activity implements OnTouchListener,
 
 		Button stop = (Button) findViewById(R.id.stop);
 		stop.setOnClickListener(this);
+
+		Button play = (Button) findViewById(R.id.play);
+		play.setOnClickListener(this);
+
+		Button stopPlay = (Button) findViewById(R.id.stopPlay);
+		stopPlay.setOnClickListener(this);
 		info = (TextView) findViewById(R.id.info);
 		state = (TextView) findViewById(R.id.state);
 
@@ -81,7 +96,6 @@ public class TestSpeedActivity extends Activity implements OnTouchListener,
 
 	@Override
 	public void onBeginningOfSpeech() {
-		Log.d(TAG, "onBeginningOfSpeech");
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
@@ -93,11 +107,13 @@ public class TestSpeedActivity extends Activity implements OnTouchListener,
 
 	@Override
 	public void onBufferReceived(byte[] buffer) {
-//		Log.d(TAG, "onBufferReceived");
+		Log.d(TAG, "onBufferReceived:" + buffer.length);
+		InjectUtil.copySound(buffer, buffer.length);
 	}
 
 	@Override
 	public void onEndOfSpeech() {
+		InjectUtil.stopRecord();
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
@@ -197,7 +213,7 @@ public class TestSpeedActivity extends Activity implements OnTouchListener,
 		mHandler.post(new Runnable() {
 			@Override
 			public void run() {
-				state.setText("rms:"+rmsdB);
+				state.setText("rms:" + rmsdB);
 				state.invalidate();
 			}
 		});
@@ -269,6 +285,7 @@ public class TestSpeedActivity extends Activity implements OnTouchListener,
 	public void onClick(View v) {
 		switch (v.getId()) {
 		case R.id.speak:
+			InjectUtil.clearRecord();
 			mHandler.post(new Runnable() {
 
 				@Override
@@ -289,7 +306,59 @@ public class TestSpeedActivity extends Activity implements OnTouchListener,
 			});
 			engine.onStopListening(TestSpeedActivity.this);
 			break;
+		case R.id.play:
+			String mFileName = getFilesDir() + FILE_NAME;
+			play(mFileName);
+			break;
+		case R.id.stopPlay:
+			stopPlay();
+			break;
 		}
 
 	}
+
+	private void play(String fileName) {
+		FileInputStream fis = null;
+		try {
+			fis = new FileInputStream(new File(fileName));
+			byte[] sound = new byte[fis.available()];
+			int read = fis.read(sound);
+			if (read > 0) {
+				mAudioTrack.init();
+				mAudioTrack.playAudioTrack(sound, 0, read);
+				Log.d(TAG, "play:" + read);
+			}
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			if (fis != null) {
+				try {
+					fis.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+	}
+
+	protected void stopPlay() {
+		mAudioTrack.release();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		mAudioTrack.release();
+		mAudioTrack = null;
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		mAudioTrack = new MyAudioTrack(8000, AudioFormat.CHANNEL_OUT_MONO,
+				AudioFormat.ENCODING_PCM_16BIT);
+	}
+
 }

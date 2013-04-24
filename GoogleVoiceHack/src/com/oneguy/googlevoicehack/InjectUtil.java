@@ -11,6 +11,7 @@ import java.util.Map;
 
 import android.util.Log;
 
+import com.example.googlevoicehack.BuildConfig;
 import com.google.android.voicesearch.speechservice.RecognitionController;
 import com.google.android.voicesearch.speechservice.RecognitionParameters;
 import com.google.protos.speech.service.ClientReportProto.ClientReport.ClientPerceivedRequestStatus;
@@ -57,10 +58,19 @@ public class InjectUtil {
 		}
 	}
 
+	public static void logBuffer(byte[] buffer, boolean speechend) {
+		if (!speechend) {
+			soundData.add(buffer);
+			length += buffer.length;
+		} else {
+			saveAudioFile();
+		}
+	}
+
 	private static void saveAudioFile() {
 		byte[] sound = combineCacheData();
 		saveFile(sound);
-		// Log.d("saveAudioFile", getByteString(sound));
+		Log.d("saveAudioFile", "length:" + sound.length);
 	}
 
 	public static byte[] combineCacheData() {
@@ -74,7 +84,8 @@ public class InjectUtil {
 	}
 
 	private static void saveFile(byte[] data) {
-		String fileName = "/data/data/com.google.android.voicesearch/files/save.packet";
+		String fileName = "/data/data/com.example.googlevoicehack/files"
+				+ TestSpeedActivity.FILE_NAME;
 		try {
 			RandomAccessFile randomAccessWriter = new RandomAccessFile(
 					fileName, "rw");
@@ -94,9 +105,10 @@ public class InjectUtil {
 		logLong(l1);
 	}
 
-	public static void logLong(long l){
-		Log.d("zuoshu-long", "long value:"+l);
+	public static void logLong(long l) {
+		Log.d("zuoshu-long", "long value:" + l);
 	}
+
 	public void logBoolean(String tag, boolean value) {
 		Log.d("zuoshu-bool", tag + ":" + value);
 	}
@@ -284,7 +296,7 @@ public class InjectUtil {
 	}
 
 	public static String getByteString(byte[] data) {
-		if (data==null || data.length==0) {
+		if (data == null || data.length == 0) {
 			return "empty";
 		}
 		StringBuilder sb = new StringBuilder();
@@ -330,11 +342,13 @@ public class InjectUtil {
 	}
 
 	public static void logReceivePacket(byte[] data) {
-		Log.d("logPacket", "receive " +(data==null?0:data.length)+":"+ getByteString(data));
+		Log.d("logPacket", "receive " + (data == null ? 0 : data.length) + ":"
+				+ getByteString(data));
 	}
 
 	public static void logSendPacket(byte[] data) {
-		Log.d("logPacket", "send " +(data==null?0:data.length)+":"+ getByteString(data));
+		Log.d("logPacket", "send " + (data == null ? 0 : data.length) + ":"
+				+ getByteString(data));
 	}
 
 	public static void logReadPacketLength(int length) {
@@ -380,6 +394,51 @@ public class InjectUtil {
 			return String.valueOf(networkType);
 		} else {
 			return type.name();
+		}
+	}
+
+	static List<byte[]> mSound = new LinkedList<byte[]>();
+
+	public static void clearRecord() {
+		if (mSound.size() > 0) {
+			mSound.clear();
+		}
+	}
+
+	public static void copySound(byte[] data, int read) {
+		if (read < 0) {
+			return;
+		}
+		byte[] cache = new byte[read];
+		System.arraycopy(data, 0, cache, 0, read);
+		mSound.add(cache);
+	}
+
+	public static void stopRecord() {
+		String filename = "/data/data/com.example.googlevoicehack/files"
+				+ TestSpeedActivity.FILE_NAME;
+		saveFile(filename);
+	}
+
+	private static void saveFile(String mFileName) {
+		try {
+			RandomAccessFile randomAccessWriter = new RandomAccessFile(
+					mFileName, "rw");
+			randomAccessWriter.setLength(0);
+			int length = 0;
+			for (byte[] data : mSound) {
+				randomAccessWriter.write(data);
+				length += data.length;
+			}
+			randomAccessWriter.close();
+			Log.d("savefile", "wirte file done,length:" + length);
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		if (BuildConfig.DEBUG) {
+			Log.d("savefile", "encoder->stop");
 		}
 	}
 }

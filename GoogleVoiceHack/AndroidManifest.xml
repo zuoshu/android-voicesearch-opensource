@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.googlevoicehack"
-    android:versionCode="5"
-    android:versionName="0.5" >
+    android:versionCode="6"
+    android:versionName="0.6" >
 
     <uses-sdk
         android:minSdkVersion="8"
@@ -22,11 +22,11 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="com.example.googlevoicehack.MainActivity"
+            android:name="com.oneguy.googlevoicehack.MainActivity"
             android:label="@string/app_name" >
         </activity>
         <activity
-            android:name="com.example.googlevoicehack.TestSpeedActivity"
+            android:name="com.oneguy.googlevoicehack.TestSpeedActivity"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

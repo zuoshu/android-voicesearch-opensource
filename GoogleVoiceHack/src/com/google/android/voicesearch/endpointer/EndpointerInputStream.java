@@ -17,18 +17,18 @@ public class EndpointerInputStream extends InputStream implements
 	private static final int FRAME_LENGTH_MS = 20;
 	private static final int SAMPLES_PER_FRAME = 160;
 	private static final int SAMPLE_RATE_HZ = 8000;
+	private static final int STATE_SPEECH_COMPLETE = -1;
 	private static final int STATE_ENVIRONMENT_ESTIMATION = -2;
+	private static final int STATE_NOISE_JUDGING_COMPLETE = -3;
 	private static final int STATE_NOISE_JUDGED_ABSENT = -4;
 	private static final int STATE_NOISE_JUDGED_PRESENT = -5;
 	private static final int STATE_NOISE_JUDGING = -6;
-	private static final int STATE_NOISE_JUDGING_COMPLETE = -3;
 	private static final int STATE_NOISE_JUDGING_FOR_SERVER = -7;
 	private static final int STATE_POSSIBLE_OFFSET = 13;
 	private static final int STATE_POSSIBLE_ONSET = 11;
 	private static final int STATE_POST_SPEECH = 14;
 	private static final int STATE_PRE_SPEECH = 10;
 	private static final int STATE_SIGNAL_NOT_AVAILABLE = 15;
-	private static final int STATE_SPEECH_COMPLETE = -1;
 	private static final int STATE_SPEECH_PRESENT = 12;
 	private static final String TAG = "EndpointerInputStream";
 	private byte[] mBuf = new byte[320];
@@ -319,7 +319,9 @@ public class EndpointerInputStream extends InputStream implements
 			processAudio(this.mNativeHandle, this.mBuf, snrArray, true,
 					this.mUseDenoiser);
 			mEnvironmentEstimationFramesRemaining--;
-			promptForSpeech(getNoiseLevel(this.mNativeHandle), snrArray[0]);
+			if (mEnvironmentEstimationFramesRemaining == 0) {
+				promptForSpeech(getNoiseLevel(this.mNativeHandle), snrArray[0]);
+			}
 			this.mBufOut = this.mBufIn;
 			return 0;
 		}

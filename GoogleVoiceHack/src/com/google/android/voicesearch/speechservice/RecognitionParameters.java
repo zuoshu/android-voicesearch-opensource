@@ -9,7 +9,7 @@ public class RecognitionParameters {
 	public static final String API_APPLICATION_ID = "intent-speech-api";
 	public static final String VOICE_SEARCH_APPLICATION_ID = "voice-search";
 	private boolean mAlternatesEnabled = true;
-	private boolean mApiMode = true;
+	private boolean mApiMode = false;
 	private int mAudioEncoding;
 	private int mAudioSampleRate;
 	private boolean mCarDock = false;
@@ -21,7 +21,7 @@ public class RecognitionParameters {
 	private int mMultislotActionType = -1;
 	private int mNetworkType = -1;
 	private float mNoiseLevel = -1.0F;
-	private boolean mPartialTranscriptsEnabled = false;
+	private boolean mPartialTranscriptsEnabled = true;
 	private Bundle mRecognitionContextBundle = null;
 	private int mRequestId = -1;
 	private String mSessionId = null;

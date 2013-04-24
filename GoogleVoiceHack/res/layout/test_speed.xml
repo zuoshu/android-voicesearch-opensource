@@ -48,6 +48,20 @@
         </Button>
 
         <Button
+            android:id="@+id/play"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="play" >
+        </Button>
+
+        <Button
+            android:id="@+id/stopPlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="stop play" >
+        </Button>
+
+        <Button
             android:id="@+id/stop"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
