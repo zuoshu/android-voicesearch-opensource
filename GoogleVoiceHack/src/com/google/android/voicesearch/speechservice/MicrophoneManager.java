@@ -23,9 +23,9 @@ public interface MicrophoneManager {
 	public void setSpeechInputPossiblyCompleteSilenceLengthMillis(long paramLong);
 
 	public AudioBuffer setupMicrophone(
-			EndpointerInputStream.Listener paramListener, int paramInt,
-			boolean paramBoolean,
-			ByteArrayOutputStream paramByteArrayOutputStream)
+			EndpointerInputStream.Listener paramListener, int networkType,
+			boolean isApiMode,
+			ByteArrayOutputStream rawAudio)
 			throws IOException;
 
 	public void stopListening();

@@ -43,7 +43,7 @@ public class MicrophoneManagerImpl implements MicrophoneManager {
 
 	private static int getEncodingOf(String encoding) {
 		Encoding enc = Encoding.valueOf(encoding);
-		if(enc == null){
+		if (enc == null) {
 			return Encoding.AMR_NB_VALUE;
 		}
 		return enc.getNumber();
@@ -67,30 +67,22 @@ public class MicrophoneManagerImpl implements MicrophoneManager {
 	}
 
 	protected AudioBuffer getMicInputStream(
-			EndpointerInputStream.Listener paramListener, int paramInt,
-			boolean paramBoolean,
-			ByteArrayOutputStream paramByteArrayOutputStream)
+			EndpointerInputStream.Listener endpointListener, int networkType,
+			boolean isApiMode, ByteArrayOutputStream rawAudio)
 			throws IOException {
-		Object localObject = new MicrophoneInputStream(this.mSamplingRate,
-				2 * this.mSamplingRate);
+		InputStream inputStream = new MicrophoneInputStream(mSamplingRate,
+				2 * mSamplingRate);
 		this.mEncoding = Encoding.AMR_NB_VALUE;
-		if (paramInt == 1)
-			;
-		for (this.mEncoding = this.mEncodingWifi;; this.mEncoding = this.mEncodingThreeG)
-			do {
-				this.mEndpointer = new EndpointerInputStream(
-						new BufferedInputStream(captureStream(
-								logStream((InputStream) localObject, "mic"),
-								paramByteArrayOutputStream), 1600), 2,
-						this.mSpeechInputMinimumLengthMillis,
-						this.mSpeechInputCompleteSilenceLengthMillis,
-						this.mSpeechInputPossiblyCompleteSilenceLengthMillis);
-				this.mEndpointer.setListener(paramListener);
-				InputStream localInputStream = Utils.getEncodingInputStream(
-						mEndpointer, mEncoding);
-				return new AudioBuffer(Utils.getAudioPacketSize(mEncoding),
-						localInputStream, paramBoolean);
-			} while (paramInt != 3);
+		this.mEndpointer = new EndpointerInputStream(new BufferedInputStream(
+				captureStream(logStream((InputStream) inputStream, "mic"),
+						rawAudio), 1600), 2, mSpeechInputMinimumLengthMillis,
+				mSpeechInputCompleteSilenceLengthMillis,
+				mSpeechInputPossiblyCompleteSilenceLengthMillis);
+		mEndpointer.setListener(endpointListener);
+		InputStream encodingInputStream = Utils.getEncodingInputStream(
+				mEndpointer, mEncoding);
+		return new AudioBuffer(Utils.getAudioPacketSize(mEncoding),
+				encodingInputStream, isApiMode);
 	}
 
 	public int getSamplingRate() {
@@ -135,13 +127,10 @@ public class MicrophoneManagerImpl implements MicrophoneManager {
 		this.mSpeechInputPossiblyCompleteSilenceLengthMillis = paramLong;
 	}
 
-	public AudioBuffer setupMicrophone(
-			EndpointerInputStream.Listener paramListener, int paramInt,
-			boolean paramBoolean,
-			ByteArrayOutputStream paramByteArrayOutputStream)
+	public AudioBuffer setupMicrophone(EndpointerInputStream.Listener listener,
+			int networkType, boolean isApiMode, ByteArrayOutputStream rawAudio)
 			throws IOException {
-		return getMicInputStream(paramListener, paramInt, paramBoolean,
-				paramByteArrayOutputStream);
+		return getMicInputStream(listener, networkType, isApiMode, rawAudio);
 	}
 
 	public void stopListening() {
