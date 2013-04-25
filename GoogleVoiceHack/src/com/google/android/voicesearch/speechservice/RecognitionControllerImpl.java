@@ -22,6 +22,7 @@ import android.util.Log;
 
 import com.google.android.voicesearch.endpointer.EndpointerInputStream;
 import com.google.android.voicesearch.endpointer.MicrophoneInputStream;
+import com.google.android.voicesearch.speechservice.AudioBuffer.AudioException;
 import com.google.protos.speech.service.ClientReportProto.ClientReport.ClientPerceivedRequestStatus;
 import com.google.protos.speech.service.PartialResult.PartialRecognitionResult;
 import com.google.protos.speech.service.SpeechService;
@@ -76,11 +77,12 @@ public class RecognitionControllerImpl implements RecognitionController,
 	private final Condition mStateChanged = this.mLock.newCondition();
 	private TimeoutTimer mWaitingForResultsTimer;
 	private TimeoutTimer mSpeechRecordingTimer;
-	private RecordAndSendManager mRecordAndSendManager;
+	// private RecordAndSendManager mRecordAndSendManager;
+	private MicrophoneManager mMicrophoneManager;
 
 	public RecognitionControllerImpl(Context context,
 			ServerConnector paramServerConnector,
-			MicrophoneManager paramMicrophoneManager) {
+			MicrophoneManager microphoneManager) {
 		mContext = context;
 		mDefaultSpeechTimeoutMillis = 10 * 1000;
 		mExtraTotalResultTimeoutMillis = 2000;
@@ -91,6 +93,7 @@ public class RecognitionControllerImpl implements RecognitionController,
 		if (this.mAudioManager == null) {
 			throw new RuntimeException("Audio manager not found");
 		}
+		mMicrophoneManager = microphoneManager;
 		this.mServerConnector = paramServerConnector;
 		this.mServerConnector.setCallback(this);
 		this.mSpeechRecordingTimer = new TimeoutTimer();
@@ -160,7 +163,30 @@ public class RecognitionControllerImpl implements RecognitionController,
 	protected void startRecognition(Intent intent) {
 		changeState(State.STARTING);
 		mParams = ParmsUtil.makeTcpSessionParms();
-		runRecognitionMainLoop();
+		mMicrophoneManager.setSpeechInputMinimumLengthMillis(0);
+		mMicrophoneManager.setSpeechInputCompleteSilenceLengthMillis(750);
+		mMicrophoneManager
+				.setSpeechInputPossiblyCompleteSilenceLengthMillis(-1);
+		if (!updateNetwork()) {
+			Log.e("RecognitionControllerImpl", "No active network found");
+			fireFailure(ERROR_NETWORK);
+			clearVariables();
+			return;
+		}
+		mRawAudio = new ByteArrayOutputStream();
+		try {
+			mAudioBuffer = mMicrophoneManager.setupMicrophone(
+					mEndpointerListener, mNetworkType, mParams.isApiMode(),
+					mRawAudio);
+			mParams.setAudioEncoding(mMicrophoneManager.getEncoding());
+			mParams.setAudioSampleRate(this.mMicrophoneManager
+					.getSamplingRate());
+			runRecognitionMainLoop();
+		} catch (IOException e) {
+			Log.e("RecognitionControllerImpl", "Audio error", e);
+			fireFailure(ERROR_AUDIO);
+			clearVariables();
+		}
 	}
 
 	private void runRecognitionMainLoop() {
@@ -187,7 +213,8 @@ public class RecognitionControllerImpl implements RecognitionController,
 			mParams.setNoiseLevel(mNoiseLevel);
 			mServerConnector.startRecognize();
 			// InjectUtil.logTime("recognize started");
-			startRecord();
+			// startRecord();
+			recordAndSend();
 			waitForFinalResult();
 			Log.i(TAG, "Final state:" + mState);
 			switch (getState()) {
@@ -216,16 +243,49 @@ public class RecognitionControllerImpl implements RecognitionController,
 				break;
 			}
 		} catch (InterruptedException e) {
-			e.printStackTrace();
+			Log.e("RecognitionControllerImpl", "InterruptedException", e);
+			fireFailure(ERROR_CLIENT);
+			clearVariables();
+		} catch (AudioException e) {
+			Log.e("RecognitionControllerImpl", "Audio error", e);
+			fireFailure(ERROR_AUDIO);
+			clearVariables();
 		}
 	}
 
-	private void startRecord() {
-		mSpeechRecordingTimer.set(mDefaultSpeechTimeoutMillis);
-		// TODO we should make it configurable
-		mRecordAndSendManager = new RecordAndSendManager(mServerConnector, 0,
-				750, -1L);
-		mRecordAndSendManager.start();
+	// private void startRecord() {
+	// mSpeechRecordingTimer.set(mDefaultSpeechTimeoutMillis);
+	// // TODO we should make it configurable
+	// mRecordAndSendManager = new RecordAndSendManager(mServerConnector, 0,
+	// 750, -1L);
+	// mRecordAndSendManager.start();
+	// }
+
+	private void recordAndSend() throws InterruptedException,
+			AudioBuffer.AudioException {
+		boolean speechend = false;
+		mSpeechRecordingTimer.set(mSpeechTimeoutMillis);
+		while ((stateIs(State.RECOGNIZING)) && (!speechend)
+				&& (mSpeechRecordingTimer.remaining() > 0L)) {
+			ByteBuffer audio = this.mAudioBuffer.getByteBuffer();
+			if (audio.remaining() == 0) {
+				Log.d(TAG, "speechend->true");
+				speechend = true;
+			}
+			this.mServerConnector.postAudioChunk(audio, speechend);
+		}
+		if ((mIsSpeechDetected) && (!speechend)) {
+			Log.d(TAG, "speechend->false && mIsSpeechDetected->true");
+			mServerConnector.postAudioChunk(mAudioBuffer.getByteBuffer(), true);
+			mMicrophoneManager.stopListening();
+		}
+		if (mIsSpeechDetected) {
+			mServerConnector.setEndpointTriggerType(3);
+		}
+		if (!stateIs(State.RECOGNIZING)) {
+			this.mServerConnector.setRequestStatus(20);
+			onError(6);
+		}
 	}
 
 	private boolean updateNetwork() {
@@ -233,7 +293,7 @@ public class RecognitionControllerImpl implements RecognitionController,
 				.getSystemService("connectivity")).getActiveNetworkInfo();
 		if ((localNetworkInfo == null) || (!localNetworkInfo.isConnected()))
 			return false;
-		this.mNetworkType = localNetworkInfo.getType();
+		mNetworkType = localNetworkInfo.getType();
 		return true;
 	}
 
@@ -377,7 +437,8 @@ public class RecognitionControllerImpl implements RecognitionController,
 		arrayOfState[3] = State.ERROR;
 		if (changeStateIfOneOf(localState, arrayOfState)) {
 			// TODO only pause audio here
-			mRecordAndSendManager.stop();
+			// mRecordAndSendManager.stop();
+			mMicrophoneManager.stopListening();
 			return;
 		}
 		Log.w("RecognitionControllerImpl", "onPause() called from illegal "
@@ -426,8 +487,8 @@ public class RecognitionControllerImpl implements RecognitionController,
 	public void onStopListening(RecognitionListener paramRecognitionListener) {
 		mRecognitionListener = paramRecognitionListener;
 		mHandler.removeMessages(START_LISTENING);
-		// mMicrophoneManager.stopListening();
-		mRecordAndSendManager.stop();
+		mMicrophoneManager.stopListening();
+		// mRecordAndSendManager.stop();
 	}
 
 	@Override
@@ -479,10 +540,10 @@ public class RecognitionControllerImpl implements RecognitionController,
 		Log.d("state", state.name());
 	}
 
-	private class EndpointerInputStreamListener
+	public class EndpointerInputStreamListener
 			implements
 			com.google.android.voicesearch.endpointer.EndpointerInputStream.Listener {
-		private EndpointerInputStreamListener() {
+		public EndpointerInputStreamListener() {
 		}
 
 		public void onBeginningOfSpeech() {
@@ -507,16 +568,15 @@ public class RecognitionControllerImpl implements RecognitionController,
 			}
 			mAudioManager.abandonAudioFocus(null);
 			mServerConnector.setEndOfSpeech();
-			mRecordAndSendManager.stop();
+//			mRecordAndSendManager.stop();
 			if (mRecognitionListener != null) {
 				mRecognitionListener.onEndOfSpeech();
 			}
 		}
 
 		public void onReadyForSpeech(float noiseLevel, float noiseRatio) {
-			// Log.i("RecognitionControllerImpl",
-			// "onReadyForSpeech, noise level:"
-			// + noiseLevel + ", snr:" + noiseRatio);
+			Log.i("RecognitionControllerImpl", "onReadyForSpeech, noise level:"
+					+ noiseLevel + ", snr:" + noiseRatio);
 			Bundle bundle = new Bundle();
 			bundle.putFloat("NoiseLevel", noiseLevel);
 			bundle.putFloat("SignalNoiseRatio", noiseRatio);

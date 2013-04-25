@@ -21,7 +21,7 @@ public class RecognitionParameters {
 	private int mMultislotActionType = -1;
 	private int mNetworkType = -1;
 	private float mNoiseLevel = -1.0F;
-	private boolean mPartialTranscriptsEnabled = true;
+	private boolean mPartialTranscriptsEnabled = false;
 	private Bundle mRecognitionContextBundle = null;
 	private int mRequestId = -1;
 	private String mSessionId = null;
