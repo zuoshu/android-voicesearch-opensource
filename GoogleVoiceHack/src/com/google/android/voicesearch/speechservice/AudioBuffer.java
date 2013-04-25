@@ -26,7 +26,6 @@ public class AudioBuffer {
 	private final Thread mCaptureThread;
 	private final InputStream mIn;
 	private final boolean mStopAfterEndpointing;
-	// private volatile boolean mStopRecording = false;
 	private volatile boolean mStopped = false;
 	private final Condition notEmpty = lock.newCondition();
 	private int readPosition = 0;
@@ -49,13 +48,14 @@ public class AudioBuffer {
 		mAudioListener = listener;
 	}
 
-	private void addPacket(ByteBuffer paramByteBuffer) {
+	private void addPacket(ByteBuffer packet) {
 		// InjectUtil.logPacket(paramByteBuffer);
+		Log.d(TAG, "addPacket:" + packet.remaining());
 		lock.lock();
 		try {
-			mBuffer.add(paramByteBuffer);
+			mBuffer.add(packet);
 			if (mAudioListener != null) {
-				mAudioListener.onAudioData(paramByteBuffer);
+				mAudioListener.onAudioData(packet);
 			}
 			notEmpty.signal();
 			return;
@@ -132,14 +132,17 @@ public class AudioBuffer {
 
 	public ByteBuffer getByteBuffer() throws AudioBuffer.AudioException,
 			InterruptedException {
-		Log.d(TAG, "getByteBuffer readPosition:" + readPosition
-				+ " mBuffer.size:" + mBuffer.size() + " mAudioException:"
-				+ mAudioException);
+		// Log.d(TAG, "getByteBuffer readPosition:" + readPosition
+		// + " mBuffer.size:" + mBuffer.size() + " mAudioException:"
+		// + mAudioException);
 		lock.lock();
 		try {
-			if ((readPosition > mBuffer.size()) || (mAudioException != null)) {
+			if (mAudioException != null) {
 				throw new AudioException("Audio capture threw exception",
 						mAudioException);
+			}
+			if (readPosition >= mBuffer.size()) {
+				notEmpty.await();
 			}
 			ArrayList<ByteBuffer> localArrayList = mBuffer;
 			ByteBuffer buffer = (ByteBuffer) localArrayList.get(readPosition++);
