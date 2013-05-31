@@ -24,25 +24,27 @@ public final class R {
         public static final int ic_launcher=0x7f020000;
     }
     public static final class id {
-        public static final int action_settings=0x7f08000e;
+        public static final int action_settings=0x7f08000f;
         public static final int buttons=0x7f08000a;
-        public static final int convert=0x7f080005;
+        public static final int convert=0x7f080004;
         public static final int info=0x7f08000b;
         public static final int infoScroll=0x7f080009;
-        public static final int oneshot=0x7f080004;
+        public static final int oneshot=0x7f080003;
         public static final int play=0x7f080002;
         public static final int speak=0x7f08000c;
-        public static final int startAudioBuffer=0x7f080006;
+        public static final int startAudioBuffer=0x7f080005;
         public static final int startRec=0x7f080000;
         public static final int state=0x7f080008;
         public static final int stop=0x7f08000d;
-        public static final int stopAudioBuffer=0x7f080007;
-        public static final int stopPlay=0x7f080003;
+        public static final int stopAudioBuffer=0x7f080006;
+        public static final int stopPlay=0x7f08000e;
         public static final int stopRec=0x7f080001;
+        public static final int testAudio=0x7f080007;
     }
     public static final class layout {
         public static final int activity_main=0x7f030000;
-        public static final int test_speed=0x7f030001;
+        public static final int test_audio_buffer=0x7f030001;
+        public static final int test_speed=0x7f030002;
     }
     public static final class menu {
         public static final int main=0x7f070000;

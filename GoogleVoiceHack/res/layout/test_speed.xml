@@ -58,7 +58,8 @@
             android:id="@+id/stopPlay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="stop play" >
+            android:text="stop play"
+            android:visibility="gone" >
         </Button>
 
         <Button

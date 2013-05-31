@@ -25,13 +25,14 @@ import com.google.protos.speech.service.SpeechService.ResponseMessage;
 import com.google.protos.wireless.voicesearch.VoiceSearch.ActionRequest;
 
 public class InjectUtil {
+	public static void logString(String str) {
+		Log.w("zuoshu", str);
+		InjectUtil.logString("first hack!");
+	}
 	public static void logParmsToString(Object o) {
 		Log.w("zuoshu", "parms:" + o.toString());
 	}
 
-	public static void logString(String str) {
-		Log.w("zuoshu", str);
-	}
 
 	public static void logControlImpl(String str) {
 		Log.w("zuoshu-c", str);
